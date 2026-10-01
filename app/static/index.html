@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Лента канала</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="topbar__name" id="topName">канал</span>
+    <button class="icon-btn" id="newBtn" aria-label="Новый пост">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg>
+    </button>
+  </header>
+
+  <main id="app" hidden>
+    <section class="profile">
+      <div class="avatar avatar--lg" id="avatar"></div>
+      <div class="profile__stats">
+        <div><b id="statPublished">0</b><span>публикаций</span></div>
+        <div><b id="statScheduled">0</b><span>в очереди</span></div>
+        <div><b id="statDraft">0</b><span>черновиков</span></div>
+      </div>
+    </section>
+    <div class="profile__bio">
+      <b id="title"></b>
+      <div class="muted" id="slotsInfo"></div>
+    </div>
+
+    <!-- ближайшие запланированные посты — как «истории» -->
+    <section class="stories" id="stories"></section>
+
+    <nav class="tabs" id="tabs">
+      <button data-status="published" class="active" title="Опубликовано">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+      </button>
+      <button data-status="scheduled" title="Очередь">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </button>
+      <button data-status="draft" title="Черновики">
+        <svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+      </button>
+      <button data-status="failed" title="Ошибки">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+      </button>
+    </nav>
+
+    <div class="view-toggle">
+      <button data-view="grid" class="active">Сетка</button>
+      <button data-view="feed">Лента</button>
+    </div>
+
+    <section id="grid" class="grid"></section>
+    <section id="feed" class="feed" hidden></section>
+    <p class="empty muted" id="empty" hidden>Здесь пока пусто</p>
+    <button class="more" id="more" hidden>Показать ещё</button>
+  </main>
+
+  <section id="login" class="login" hidden>
+    <h2>Вход</h2>
+    <p class="muted">Откройте ленту через кнопку в боте или введите ADMIN_TOKEN.</p>
+    <form id="loginForm">
+      <input type="password" id="tokenInput" placeholder="ADMIN_TOKEN" autocomplete="current-password">
+      <button class="btn btn--primary">Войти</button>
+    </form>
+    <p class="error" id="loginError"></p>
+  </section>
+
+  <!-- создание / редактирование поста -->
+  <dialog id="editor" class="sheet">
+    <form method="dialog" id="editorForm">
+      <header class="sheet__head">
+        <button type="button" class="link" data-close>Отмена</button>
+        <b id="editorTitle">Новый пост</b>
+        <button class="link link--accent" id="editorSubmit">Готово</button>
+      </header>
+
+      <div id="mediaPicker">
+        <label class="picker">
+          <input type="file" id="fileInput" accept="image/*,video/*" multiple hidden>
+          <span>+ Фото или видео (до 10)</span>
+        </label>
+        <div class="previews" id="previews"></div>
+      </div>
+
+      <textarea id="caption" rows="6" placeholder="Подпись…"></textarea>
+      <div class="counter muted"><span id="counter">0</span>/<span id="limit">4096</span></div>
+
+      <fieldset class="when" id="whenSet">
+        <label><input type="radio" name="mode" value="queue" checked> В очередь <span class="muted" id="nextSlot"></span></label>
+        <label><input type="radio" name="mode" value="at"> В указанное время</label>
+        <input type="datetime-local" id="whenInput" hidden>
+        <label><input type="radio" name="mode" value="now"> Опубликовать сейчас</label>
+        <label><input type="radio" name="mode" value="draft"> Сохранить черновик</label>
+      </fieldset>
+      <p class="error" id="editorError"></p>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
